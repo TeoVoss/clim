@@ -249,10 +249,21 @@ interface FeishuAuthResult {
 async function handleFeishuLogin(json?: boolean): Promise<void> {
   const config = await loadConfig();
 
-  // Resolve Feishu App ID: config > env var
-  const feishuAppId = config.feishuAppId || process.env.FEISHU_APP_ID || '';
+  // Fetch Feishu App ID from Provisioning (fallback to local config / env var)
+  let feishuAppId = config.feishuAppId || process.env.FEISHU_APP_ID || '';
   if (!feishuAppId) {
-    printError('Feishu App ID not configured. Set via: clim config set feishuAppId YOUR_APP_ID');
+    try {
+      const res = await fetch(`${config.provisioningUrl}/v1/auth/feishu/config`);
+      const data = await res.json() as { appId?: string; error?: string };
+      if (data.appId) {
+        feishuAppId = data.appId;
+      }
+    } catch {
+      // ignore fetch errors
+    }
+  }
+  if (!feishuAppId) {
+    printError('Feishu OAuth is not available on this server.');
     fail(EXIT_CODES.INVALID_ARGS);
   }
 

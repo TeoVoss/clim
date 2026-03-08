@@ -7,7 +7,7 @@
   "keywords": ["im", "matrix", "chat", "cli", "ai", "agent", "messenger"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/TeoVoss/clim"
+    "url": "https://github.com/anthropic/pocket-claw"
   },
   "bin": {
     "clim": "./dist/cli.mjs",

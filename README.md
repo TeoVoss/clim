@@ -17,9 +17,8 @@ npm link
 
 ```bash
 # Log in (pick one)
-# Log in (pick one)
 clim login --email you@example.com --password yourpassword
-clim login --feishu   # requires: clim config set feishuAppId YOUR_APP_ID
+clim login --feishu
 
 # Start daemon
 clim daemon start
