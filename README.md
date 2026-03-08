@@ -1,6 +1,6 @@
 # clim
 
-CLI messenger for [Pocket Claw](https://github.com/TeoVoss/pocket-claw).
+CLI messenger for [OpenClaw](https://github.com/open-claw/openclaw).
 
 ## Install
 
