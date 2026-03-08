@@ -16,9 +16,7 @@ npm link
 ## Setup
 
 ```bash
-# Configure server (default: https://pocket-claw-dev.vibelandapp.com)
-clim config set provisioningUrl https://your-server.com
-
+# Log in (pick one)
 # Log in (pick one)
 clim login --email you@example.com --password yourpassword
 clim login --feishu   # requires: clim config set feishuAppId YOUR_APP_ID
