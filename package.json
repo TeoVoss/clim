@@ -1,0 +1,33 @@
+{
+  "name": "clim",
+  "version": "0.6.0",
+  "description": "CLI messenger — chat with humans and AI agents from your terminal",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["im", "matrix", "chat", "cli", "ai", "agent", "messenger"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TeoVoss/clim"
+  },
+  "bin": {
+    "clim": "./dist/cli.mjs",
+    "climd": "./dist/daemon.mjs"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "matrix-js-sdk": "41.1.0-rc.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
+}
