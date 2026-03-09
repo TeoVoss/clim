@@ -249,18 +249,20 @@ interface FeishuAuthResult {
 async function handleFeishuLogin(json?: boolean): Promise<void> {
   const config = await loadConfig();
 
-  // Fetch Feishu App ID from Provisioning (fallback to local config / env var)
+  // Fetch Feishu config from Provisioning (App ID + callback URL)
   let feishuAppId = config.feishuAppId || process.env.FEISHU_APP_ID || '';
-  if (!feishuAppId) {
-    try {
-      const res = await fetch(`${config.provisioningUrl}/v1/auth/feishu/config`);
-      const data = await res.json() as { appId?: string; error?: string };
-      if (data.appId) {
-        feishuAppId = data.appId;
-      }
-    } catch {
-      // ignore fetch errors
+  let feishuCallbackUrl = '';
+  try {
+    const res = await fetch(`${config.provisioningUrl}/v1/auth/feishu/config`);
+    const data = await res.json() as { appId?: string; callbackUrl?: string; error?: string };
+    if (data.appId && !feishuAppId) {
+      feishuAppId = data.appId;
     }
+    if (data.callbackUrl) {
+      feishuCallbackUrl = data.callbackUrl;
+    }
+  } catch {
+    // ignore fetch errors
   }
   if (!feishuAppId) {
     printError('Feishu OAuth is not available on this server.');
@@ -271,7 +273,7 @@ async function handleFeishuLogin(json?: boolean): Promise<void> {
   const nonce = randomBytes(16).toString('hex');
 
   // Build Feishu authorize URL
-  const redirectUri = `${config.provisioningUrl}/v1/auth/feishu/callback/cli`;
+  const redirectUri = feishuCallbackUrl || `${config.provisioningUrl}/v1/auth/feishu/callback/cli`;
   const state = JSON.stringify({ port, nonce });
   const authorizeUrl =
     `https://open.feishu.cn/open-apis/authen/v1/authorize` +
