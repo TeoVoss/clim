@@ -61,6 +61,7 @@ export class MatrixSyncManager {
   private syncTokenPath: string | null = null;
   private syncTokenSaveTimer: NodeJS.Timeout | null = null;
   private stopping = false;
+  private autoJoinAttempted = new Set<string>();
   async start(config: MatrixSyncConfig): Promise<void> {
     this.currentConfig = config;
     this.syncTokenPath = config.syncTokenPath ?? null;
@@ -137,6 +138,15 @@ export class MatrixSyncManager {
         })
       );
     });
+
+    // Auto-join group invites (same approach as Flutter App).
+    // DM invites are auto-joined by Synapse (groupPolicy: open);
+    // group invites need explicit client-side join.
+    client.on(sdk.RoomEvent.MyMembership, (room, membership) => {
+      if (membership === 'invite') {
+        this.tryAutoJoinRoom(room);
+      }
+    });
     this.startSyncTokenAutoSave();
 
     await new Promise<void>((resolve) => {
@@ -160,6 +170,9 @@ export class MatrixSyncManager {
       client.on(sdk.ClientEvent.Sync, onSync);
       client.startClient({ initialSyncLimit: 20 });
     });
+
+    // After initial sync, check for any pending group invites.
+    this.autoJoinPendingInvites();
   }
 
   private async handleSyncState(state: sdk.SyncState): Promise<void> {
@@ -329,6 +342,44 @@ export class MatrixSyncManager {
   isSyncing(): boolean {
     return this.syncing;
   }
+
+  private tryAutoJoinRoom(room: sdk.Room): void {
+    const roomId = room.roomId;
+
+    // Skip if already attempted.
+    if (this.autoJoinAttempted.has(roomId)) {
+      return;
+    }
+
+    // Skip DM rooms — Synapse handles those via groupPolicy: open.
+    const isDirect = room.getDMInviter() !== undefined;
+    if (isDirect) {
+      return;
+    }
+
+    this.autoJoinAttempted.add(roomId);
+    console.log(`[MatrixSync] auto-joining group invite ${roomId}`);
+
+    this.client?.joinRoom(roomId).catch((err) => {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[MatrixSync] auto-join failed for ${roomId}: ${message}`);
+      this.autoJoinAttempted.delete(roomId); // Allow retry on next sync
+    });
+  }
+
+  private autoJoinPendingInvites(): void {
+    if (!this.client) {
+      return;
+    }
+
+    const rooms = this.client.getRooms();
+    for (const room of rooms) {
+      if (String(room.getMyMembership()).toLowerCase() === 'invite') {
+        this.tryAutoJoinRoom(room);
+      }
+    }
+  }
+
 
   getRooms(): RoomInfo[] {
     const client = this.requireClient();
