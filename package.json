@@ -1,10 +1,18 @@
 {
   "name": "clim",
-  "version": "0.6.0",
-  "description": "CLI messenger — chat with humans and AI agents from your terminal",
+  "version": "0.6.1",
+  "description": "CLI messenger \u2014 chat with humans and AI agents from your terminal",
   "type": "module",
   "license": "MIT",
-  "keywords": ["im", "matrix", "chat", "cli", "ai", "agent", "messenger"],
+  "keywords": [
+    "im",
+    "matrix",
+    "chat",
+    "cli",
+    "ai",
+    "agent",
+    "messenger"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/anthropic/pocket-claw"
