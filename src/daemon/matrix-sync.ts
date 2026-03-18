@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import * as sdk from 'matrix-js-sdk';
 import { createEvent, type StructuredEvent, type ClimEventMeta, CLIM_EVENT_KEY } from '../shared/events.js';
+import type { RoomMessageEventContent } from 'matrix-js-sdk/lib/@types/events.js';
 
 export interface RoomMember {
   userId: string;
@@ -406,10 +407,8 @@ export class MatrixSyncManager {
 
   async sendMessage(roomId: string, body: string, eventMeta?: ClimEventMeta): Promise<{ eventId: string }> {
     const client = this.requireClient();
-    const content: Record<string, unknown> = { msgtype: sdk.MsgType.Text, body };
-    if (eventMeta) {
-      content[CLIM_EVENT_KEY] = eventMeta;
-    }
+    const base: RoomMessageEventContent = { msgtype: sdk.MsgType.Text, body };
+    const content = eventMeta ? { ...base, [CLIM_EVENT_KEY]: eventMeta } : base;
     const result = await client.sendMessage(roomId, content);
     return { eventId: result.event_id };
   }

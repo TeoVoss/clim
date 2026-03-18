@@ -13,6 +13,14 @@
     "clim": "./dist/cli.mjs",
     "climd": "./dist/daemon.mjs"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/lib.mjs",
+      "types": "./dist/lib.d.ts"
+    }
+  },
+  "main": "./dist/lib.mjs",
+  "types": "./dist/lib.d.ts",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

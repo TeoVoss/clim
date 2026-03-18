@@ -22,4 +22,14 @@ export default defineConfig([
     banner: { js: '#!/usr/bin/env node' },
     sourcemap: true,
   },
+  {
+    entry: { lib: 'src/lib.ts' },
+    format: ['esm'],
+    outDir: 'dist',
+    outExtension: () => ({ js: '.mjs' }),
+    target: 'node22',
+    platform: 'node',
+    dts: true,
+    sourcemap: true,
+  },
 ]);
